@@ -15,12 +15,24 @@ pipeline: Pipeline = joblib.load("model.pkl")  # Ensure model.pkl exists
 
 # Function to extract text from PDF
 def extract_text_from_pdf(uploaded_file):
-    """Extracts text from an uploaded PDF file."""
-    text = ""
-    with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
+    """Extract text from a PDF file uploaded via Streamlit."""
+    try:
+        # Read the file as bytes
+        pdf_data = uploaded_file.read()
+
+        # Open the PDF document correctly
+        doc = fitz.open(stream=pdf_data, filetype="pdf")
+
+        # Extract text from all pages
+        text = ""
         for page in doc:
             text += page.get_text("text") + "\n"
-    return text.strip()
+
+        doc.close()
+        return text.strip()
+
+    except Exception as e:
+        return f"Error extracting text: {e}"
 
 # Function to extract text from DOCX
 def extract_text_from_docx(uploaded_file):
